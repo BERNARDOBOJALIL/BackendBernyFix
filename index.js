@@ -20,6 +20,8 @@ mongoose.connect(process.env.MONGO_URI, {
 // Rutas
 const usuariosRouter = require('./routes/usuarios');
 app.use('/api/usuarios', usuariosRouter);
+const loginRouter = require('./routes/login');
+app.use('/api/login', loginRouter);
 
 // Puedes agregar más rutas aquí
 // const tramitesRouter = require('./routes/tramites');
