@@ -25,7 +25,12 @@ const UsuarioSchema = new mongoose.Schema({
   bloqueado: {
     type: Boolean,
     default: false
-  },
+    },
+   rol: {
+     type: String,
+     enum: ['usuario', 'admin'],
+     default: 'usuario'
+    },
   fechaRegistro: {
     type: Date,
     default: Date.now
