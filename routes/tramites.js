@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const Tramite = require('../models/Tramite');
 const verificarToken = require('../middlewares/auth');
@@ -46,9 +47,12 @@ router.put('/:id/documentos', verificarToken, async (req, res) => {
 // 3. Consultar todos los trámites del usuario logueado
 router.get('/mios', verificarToken, async (req, res) => {
     try {
-        const tramites = await Tramite.find({ usuario_id: req.usuario.id });
+        console.log('?? Usuario autenticado en /mios:', req.usuario);
+        const usuarioObjectId = new mongoose.Types.ObjectId(req.usuario.id);
+        const tramites = await Tramite.find({ usuario_id: usuarioObjectId });
         res.json(tramites);
     } catch (error) {
+        console.error('? Error en /mios:', error.message);
         res.status(500).json({ mensaje: error.message });
     }
 });
@@ -100,7 +104,7 @@ router.put('/:id/aprobar', verificarToken, validarRol(['admin']), async (req, re
         const tramite = await Tramite.findById(req.params.id);
         if (!tramite) return res.status(404).json({ mensaje: 'Trámite no encontrado' });
 
-        tramite.estado = 'completado'; // o 'aprobado' si defines ese estado
+        tramite.estado = 'completado';
         await tramite.save();
 
         res.json({ mensaje: 'Trámite aprobado', tramite });
