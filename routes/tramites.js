@@ -47,12 +47,10 @@ router.put('/:id/documentos', verificarToken, async (req, res) => {
 // 3. Consultar todos los trámites del usuario logueado
 router.get('/mios', verificarToken, async (req, res) => {
     try {
-        console.log('?? Usuario autenticado en /mios:', req.usuario);
-        const usuarioObjectId = new mongoose.Types.ObjectId(req.usuario.id);
-        const tramites = await Tramite.find({ usuario_id: usuarioObjectId });
+        console.log('Usuario autenticado:', req.usuario);
+        const tramites = await Tramite.find({ usuario_id: req.usuario.id });
         res.json(tramites);
     } catch (error) {
-        console.error('? Error en /mios:', error.message);
         res.status(500).json({ mensaje: error.message });
     }
 });
