@@ -33,6 +33,10 @@ app.use('/api/usuarios', usuariosRouter);
 const loginRouter = require('./routes/login');
 app.use('/api/login', loginRouter);
 
+const tramitesRouter = require('./routes/tramites');
+app.use('/api/tramites', tramitesRouter);
+
+
 // Aquí puedes agregar más rutas en el futuro
 // const tramitesRouter = require('./routes/tramites');
 // app.use('/api/tramites', tramitesRouter);
