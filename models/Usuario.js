@@ -18,7 +18,7 @@ const UsuarioSchema = new mongoose.Schema({
     email: String,
     telefono: String
   },
-  contraseña: {
+  password: {
     type: String,
     required: true // Debe estar hasheada
   },
