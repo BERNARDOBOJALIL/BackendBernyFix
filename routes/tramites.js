@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Tramite = require('../models/Tramite');
 const verificarToken = require('../middlewares/auth');
-const validarRol = require('../middlewares/validarRol');
+const validarRol = require('../middlewares/ValidarRol');
 
 // 1. Crear trámite (usuario)
 router.post('/', verificarToken, async (req, res) => {
