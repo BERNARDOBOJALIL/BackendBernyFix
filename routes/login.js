@@ -4,10 +4,10 @@ const Usuario = require('../models/Usuario');
 const bcrypt = require('bcryptjs');
 
 router.post('/', async (req, res) => {
-    const { numeroIdentificacion, password } = req.body;
+    const { email, password } = req.body;
 
     try {
-        const usuario = await Usuario.findOne({ numeroIdentificacion });
+        const usuario = await Usuario.findOne({ 'contacto.email': email });
 
         if (!usuario) {
             return res.status(404).json({ mensaje: 'Usuario no encontrado' });
@@ -40,3 +40,4 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
+
