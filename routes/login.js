@@ -4,6 +4,7 @@ const Usuario = require('../models/Usuario');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+// Login con email y password
 router.post('/', async (req, res) => {
     const { email, password } = req.body;
 
@@ -19,12 +20,11 @@ router.post('/', async (req, res) => {
         }
 
         const esValida = await bcrypt.compare(password, usuario.password);
-
         if (!esValida) {
             return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
         }
 
-        // Crear token JWT con id y rol
+        // ?? Generar token JWT
         const token = jwt.sign(
             {
                 id: usuario._id,
@@ -34,6 +34,7 @@ router.post('/', async (req, res) => {
             { expiresIn: '2h' }
         );
 
+        // ? Responder con el token
         res.json({
             mensaje: 'Inicio de sesión exitoso',
             token,
@@ -44,7 +45,6 @@ router.post('/', async (req, res) => {
                 rol: usuario.rol
             }
         });
-
     } catch (error) {
         console.error(error);
         res.status(500).json({ mensaje: 'Error en el servidor' });
