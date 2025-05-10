@@ -1,21 +1,24 @@
 const jwt = require('jsonwebtoken');
 
-function auth(req, res, next) {
-    const authHeader = req.headers.authorization;
+function verificarToken(req, res, next) {
+    const token = req.header('Authorization');
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
         return res.status(401).json({ mensaje: 'Token no proporcionado' });
     }
 
-    const token = authHeader.split(' ')[1];
-
     try {
-        const payload = jwt.verify(token, process.env.JWT_SECRET);
-        req.usuario = payload; // { id, rol }
+        const tokenSinBearer = token.startsWith('Bearer ')
+            ? token.split(' ')[1]
+            : token;
+
+        const decoded = jwt.verify(tokenSinBearer, process.env.JWT_SECRET);
+        req.usuario = decoded; // Guardamos la info del usuario en el request
         next();
     } catch (error) {
-        return res.status(403).json({ mensaje: 'Token inválido o expirado' });
+        return res.status(403).json({ mensaje: 'Token inválido' });
     }
 }
 
-module.exports = auth;
+module.exports = verificarToken;
+
