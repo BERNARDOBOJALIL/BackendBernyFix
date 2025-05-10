@@ -4,7 +4,7 @@ const Usuario = require('../models/Usuario');
 const bcrypt = require('bcryptjs');
 
 router.post('/', async (req, res) => {
-    const { numeroIdentificacion, contraseña } = req.body;
+    const { numeroIdentificacion, password } = req.body;
 
     try {
         const usuario = await Usuario.findOne({ numeroIdentificacion });
@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
             return res.status(403).json({ mensaje: 'Usuario bloqueado' });
         }
 
-        const esValida = await bcrypt.compare(contraseña, usuario.contraseña);
+        const esValida = await bcrypt.compare(password, usuario.password);
 
         if (!esValida) {
             return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
