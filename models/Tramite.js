@@ -25,6 +25,15 @@ const TramiteSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  fechaCita: {
+    type: Date,
+    required: true
+  },
+  estadoCita: {
+    type: String,
+    enum: ['programada', 'completada', 'cancelada', 'no_asistio'],
+    default: 'programada'
+  },
   documentos: [{
     tipo: String,
     archivo: String,
