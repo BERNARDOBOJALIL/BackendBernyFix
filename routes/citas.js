@@ -4,43 +4,24 @@ const Cita = require('../models/Cita');
 const verificarToken = require('../middlewares/auth');
 const validarRol = require('../middlewares/ValidarRol');
 
-// 1. Agendar cita (usuario) + crear trámite automáticamente
+// 1. Agendar cita (usuario)
 router.post('/', verificarToken, async (req, res) => {
     try {
-        const { tipoTramite_id, fechaHora } = req.body;
+        const { tramite_id, fechaHora } = req.body;
 
-        // Crear el trámite primero
-        const nuevoTramite = new Tramite({
-            usuario_id: req.usuario.id,
-            tipoTramite_id,
-            codigoTramite: 'TRM-' + Date.now(),
-            documentos: []
-        });
-
-        const tramiteGuardado = await nuevoTramite.save();
-
-        // Luego crear la cita asociada al trámite
         const nuevaCita = new Cita({
             usuario_id: req.usuario.id,
-            tipoTramite_id,
-            codigoTramite: tramiteGuardado.codigoTramite,
+            tramite_id,
             fechaHora,
-            estadoCita: 'programada',
-            estadoTramite: 'pendiente' // Opcional si ya está por defecto
+            estado: 'programada'
         });
 
         const citaGuardada = await nuevaCita.save();
-
-        res.status(201).json({
-            mensaje: 'Cita y trámite creados exitosamente',
-            tramite: tramiteGuardado,
-            cita: citaGuardada
-        });
+        res.status(201).json(citaGuardada);
     } catch (error) {
         res.status(400).json({ mensaje: error.message });
     }
 });
-
 
 // 2. Ver todas las citas (admin)
 router.get('/', verificarToken, validarRol(['admin']), async (req, res) => {
