@@ -6,40 +6,36 @@ const validarRol = require('../middlewares/ValidarRol');
 
 // 1. Agendar cita (usuario)
 router.post('/', verificarToken, async (req, res) => {
-    try {
-        const { tramite_id: tipoTramite_id, fechaHora } = req.body;
+  try {
+    const { tipoTramite_id, fechaHora, documentos = [] } = req.body;
 
-        if (!tipoTramite_id || !fechaHora) {
-            return res.status(400).json({ mensaje: "Faltan campos obligatorios" });
-        }
-
-        // Crear el trámite automáticamente
-        const nuevoTramite = new Tramite({
-            codigoTramite: `TRM-${Date.now()}`,
-            usuario_id: req.usuario.id,
-            tipoTramite_id: tipoTramite_id
-        });
-
-        const tramiteGuardado = await nuevoTramite.save();
-
-        // Crear la cita vinculada al trámite recién creado
-        const nuevaCita = new Cita({
-            usuario_id: req.usuario.id,
-            tramite_id: tramiteGuardado._id,
-            fechaHora,
-            estado: 'programada'
-        });
-
-        const citaGuardada = await nuevaCita.save();
-
-        res.status(201).json({
-            mensaje: 'Cita y trámite creados correctamente',
-            cita: citaGuardada,
-            tramite: tramiteGuardado
-        });
-    } catch (error) {
-        res.status(400).json({ mensaje: error.message });
+    if (!tipoTramite_id || !fechaHora) {
+      return res.status(400).json({ mensaje: "Faltan campos obligatorios" });
     }
+
+    const codigoTramite = `TRM-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    const nuevaCita = new Cita({
+      usuario_id: req.usuario.id,
+      codigoTramite,
+      tipoTramite_id,
+      fechaHora,
+      documentos,
+      estadoTramite: 'pendiente',
+      estadoCita: 'programada',
+      fechaSolicitud: new Date()
+    });
+
+    const citaGuardada = await nuevaCita.save();
+
+    res.status(201).json({
+      mensaje: 'Cita creada correctamente',
+      cita: citaGuardada
+    });
+  } catch (error) {
+    console.error('❌ Error al crear la cita:', error);
+    res.status(500).json({ mensaje: 'Error al crear la cita' });
+  }
 });
 
 // 2. Ver todas las citas (admin)
