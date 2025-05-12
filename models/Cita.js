@@ -1,44 +1,24 @@
+const mongoose = require('mongoose');
+
 const CitaSchema = new mongoose.Schema({
   usuario_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Usuario',
     required: true
   },
-  tipoTramite_id: {
+  tramite_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'TipoTramite',
+    ref: 'Tramite',
     required: true
-  },
-  codigoTramite: {
-    type: String,
-    required: true,
-    unique: true
   },
   fechaHora: {
     type: Date,
     required: true
   },
-  documentos: [{
-    tipo: String,
-    archivo: String,
-    fechaCarga: {
-      type: Date,
-      default: Date.now
-    }
-  }],
-  estadoTramite: {
-    type: String,
-    enum: ['pendiente', 'en_proceso', 'completado', 'rechazado'],
-    default: 'pendiente'
-  },
-  estadoCita: {
+  estado: {
     type: String,
     enum: ['programada', 'completada', 'cancelada', 'no_asistio'],
     default: 'programada'
-  },
-  fechaSolicitud: {
-    type: Date,
-    default: Date.now
   }
 });
 

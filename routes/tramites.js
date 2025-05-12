@@ -1,5 +1,4 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const router = express.Router();
 const Tramite = require('../models/Tramite');
 const verificarToken = require('../middlewares/auth');
@@ -47,9 +46,7 @@ router.put('/:id/documentos', verificarToken, async (req, res) => {
 // 3. Consultar todos los tr�mites del usuario logueado
 router.get('/mios', verificarToken, async (req, res) => {
     try {
-        console.log('Usuario autenticado:', req.usuario);
-        const tramites = await Tramite.find({ usuario_id: req.usuario.id }).populate('tipoTramite_id'); // Esto trae los detalles del tipo de trámite
-
+        const tramites = await Tramite.find({ usuario_id: req.usuario.id });
         res.json(tramites);
     } catch (error) {
         res.status(500).json({ mensaje: error.message });
@@ -103,7 +100,7 @@ router.put('/:id/aprobar', verificarToken, validarRol(['admin']), async (req, re
         const tramite = await Tramite.findById(req.params.id);
         if (!tramite) return res.status(404).json({ mensaje: 'Tr�mite no encontrado' });
 
-        tramite.estado = 'completado';
+        tramite.estado = 'completado'; // o 'aprobado' si defines ese estado
         await tramite.save();
 
         res.json({ mensaje: 'Tr�mite aprobado', tramite });

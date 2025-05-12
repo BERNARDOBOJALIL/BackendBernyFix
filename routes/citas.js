@@ -6,36 +6,21 @@ const validarRol = require('../middlewares/ValidarRol');
 
 // 1. Agendar cita (usuario)
 router.post('/', verificarToken, async (req, res) => {
-  try {
-    const { tipoTramite_id, fechaHora, documentos = [] } = req.body;
+    try {
+        const { tramite_id, fechaHora } = req.body;
 
-    if (!tipoTramite_id || !fechaHora) {
-      return res.status(400).json({ mensaje: "Faltan campos obligatorios" });
+        const nuevaCita = new Cita({
+            usuario_id: req.usuario.id,
+            tramite_id,
+            fechaHora,
+            estado: 'programada'
+        });
+
+        const citaGuardada = await nuevaCita.save();
+        res.status(201).json(citaGuardada);
+    } catch (error) {
+        res.status(400).json({ mensaje: error.message });
     }
-
-    const codigoTramite = `TRM-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-    const nuevaCita = new Cita({
-      usuario_id: req.usuario.id,
-      codigoTramite,
-      tipoTramite_id,
-      fechaHora,
-      documentos,
-      estadoTramite: 'pendiente',
-      estadoCita: 'programada',
-      fechaSolicitud: new Date()
-    });
-
-    const citaGuardada = await nuevaCita.save();
-
-    res.status(201).json({
-      mensaje: 'Cita creada correctamente',
-      cita: citaGuardada
-    });
-  } catch (error) {
-    console.error('❌ Error al crear la cita:', error);
-    res.status(500).json({ mensaje: 'Error al crear la cita' });
-  }
 });
 
 // 2. Ver todas las citas (admin)
@@ -64,7 +49,5 @@ router.put('/:id/estado', verificarToken, validarRol(['admin']), async (req, res
         res.status(400).json({ mensaje: error.message });
     }
 });
-
-
 
 module.exports = router;
