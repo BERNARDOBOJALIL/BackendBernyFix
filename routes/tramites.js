@@ -5,7 +5,7 @@ const Tramite = require('../models/Tramite');
 const verificarToken = require('../middlewares/auth');
 const validarRol = require('../middlewares/ValidarRol');
 
-// 1. Crear trámite (usuario)
+// 1. Crear trï¿½mite (usuario)
 router.post('/', verificarToken, async (req, res) => {
     try {
         const nuevoTramite = new Tramite({
@@ -22,14 +22,14 @@ router.post('/', verificarToken, async (req, res) => {
     }
 });
 
-// 2. Subir documentos a un trámite (usuario)
+// 2. Subir documentos a un trï¿½mite (usuario)
 router.put('/:id/documentos', verificarToken, async (req, res) => {
     try {
         const tramite = await Tramite.findById(req.params.id);
-        if (!tramite) return res.status(404).json({ mensaje: 'Trámite no encontrado' });
+        if (!tramite) return res.status(404).json({ mensaje: 'Trï¿½mite no encontrado' });
 
         if (tramite.usuario_id.toString() !== req.usuario.id) {
-            return res.status(403).json({ mensaje: 'No autorizado para modificar este trámite' });
+            return res.status(403).json({ mensaje: 'No autorizado para modificar este trï¿½mite' });
         }
 
         tramite.documentos.push({
@@ -38,31 +38,32 @@ router.put('/:id/documentos', verificarToken, async (req, res) => {
         });
 
         await tramite.save();
-        res.json({ mensaje: 'Documento añadido correctamente', tramite });
+        res.json({ mensaje: 'Documento aï¿½adido correctamente', tramite });
     } catch (error) {
         res.status(400).json({ mensaje: error.message });
     }
 });
 
-// 3. Consultar todos los trámites del usuario logueado
+// 3. Consultar todos los trï¿½mites del usuario logueado
 router.get('/mios', verificarToken, async (req, res) => {
     try {
         console.log('Usuario autenticado:', req.usuario);
-        const tramites = await Tramite.find({ usuario_id: req.usuario.id });
+        const tramites = await Tramite.find({ usuario_id: req.usuario.id }).populate('tipoTramite_id'); // Esto trae los detalles del tipo de trÃ¡mite
+
         res.json(tramites);
     } catch (error) {
         res.status(500).json({ mensaje: error.message });
     }
 });
 
-// 4. Ver un trámite propio por ID
+// 4. Ver un trï¿½mite propio por ID
 router.get('/:id', verificarToken, async (req, res) => {
     try {
         const tramite = await Tramite.findById(req.params.id);
-        if (!tramite) return res.status(404).json({ mensaje: 'Trámite no encontrado' });
+        if (!tramite) return res.status(404).json({ mensaje: 'Trï¿½mite no encontrado' });
 
         if (tramite.usuario_id.toString() !== req.usuario.id) {
-            return res.status(403).json({ mensaje: 'No tienes permiso para ver este trámite' });
+            return res.status(403).json({ mensaje: 'No tienes permiso para ver este trï¿½mite' });
         }
 
         res.json(tramite);
@@ -71,7 +72,7 @@ router.get('/:id', verificarToken, async (req, res) => {
     }
 });
 
-// 5. Ver todos los trámites (admin)
+// 5. Ver todos los trï¿½mites (admin)
 router.get('/', verificarToken, validarRol(['admin']), async (req, res) => {
     try {
         const tramites = await Tramite.find();
@@ -81,11 +82,11 @@ router.get('/', verificarToken, validarRol(['admin']), async (req, res) => {
     }
 });
 
-// 6. Cambiar estado del trámite (admin)
+// 6. Cambiar estado del trï¿½mite (admin)
 router.put('/:id/estado', verificarToken, validarRol(['admin']), async (req, res) => {
     try {
         const tramite = await Tramite.findById(req.params.id);
-        if (!tramite) return res.status(404).json({ mensaje: 'Trámite no encontrado' });
+        if (!tramite) return res.status(404).json({ mensaje: 'Trï¿½mite no encontrado' });
 
         tramite.estado = req.body.estado;
         await tramite.save();
@@ -96,16 +97,16 @@ router.put('/:id/estado', verificarToken, validarRol(['admin']), async (req, res
     }
 });
 
-// 7. Aprobar trámite directamente (admin)
+// 7. Aprobar trï¿½mite directamente (admin)
 router.put('/:id/aprobar', verificarToken, validarRol(['admin']), async (req, res) => {
     try {
         const tramite = await Tramite.findById(req.params.id);
-        if (!tramite) return res.status(404).json({ mensaje: 'Trámite no encontrado' });
+        if (!tramite) return res.status(404).json({ mensaje: 'Trï¿½mite no encontrado' });
 
         tramite.estado = 'completado';
         await tramite.save();
 
-        res.json({ mensaje: 'Trámite aprobado', tramite });
+        res.json({ mensaje: 'Trï¿½mite aprobado', tramite });
     } catch (error) {
         res.status(400).json({ mensaje: error.message });
     }
