@@ -42,8 +42,7 @@ app.use('/api/dependencias', dependenciasRouter);
 const tipotramitesRouter = require('./routes/tipotramites');
 app.use('/api/tipotramites', tipotramitesRouter);
 
-const citasRouter = require('./routes/citas');
-app.use('/api/citas', citasRouter);
+
 
 
 // Aquí puedes agregar más rutas en el futuro
