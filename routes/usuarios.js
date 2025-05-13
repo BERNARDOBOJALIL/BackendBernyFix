@@ -90,6 +90,7 @@ router.put('/:id', auth, async (req, res) => {
 
 // GET /api/usuarios/me
 router.get('/me', auth, async (req, res) => {
+  console.log('req.usuario:', req.usuario); // <-- esto
   try {
     const usuario = await Usuario.findById(req.usuario.id).select('-password');
     res.json(usuario);
@@ -97,6 +98,7 @@ router.get('/me', auth, async (req, res) => {
     res.status(500).json({ mensaje: 'Error al obtener el perfil del usuario' });
   }
 });
+
 
 
 // Eliminar usuario (solo admin)
