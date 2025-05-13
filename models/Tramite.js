@@ -25,6 +25,8 @@ const TramiteSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+
+  // Documentos cargados por el usuario
   documentos: [{
     tipo: String,
     archivo: String,
@@ -32,7 +34,20 @@ const TramiteSchema = new mongoose.Schema({
       type: Date,
       default: Date.now
     }
-  }]
+  }],
+
+  // Información de la cita
+  cita: {
+    fechaHora: {
+      type: Date,
+      required: true
+    },
+    estado: {
+      type: String,
+      enum: ['programada', 'completada', 'cancelada', 'no_asistio'],
+      default: 'programada'
+    }
+  }
 });
 
 module.exports = mongoose.model('Tramite', TramiteSchema);
