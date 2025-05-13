@@ -6,12 +6,12 @@ const bcrypt = require('bcryptjs');
 const auth = require('../middlewares/auth');
 const validarRol = require('../middlewares/ValidarRol');
 
-// Función para generar un número único
+// Funciï¿½n para generar un nï¿½mero ï¿½nico
 async function generarNumeroIdentificacionUnico() {
     let numero;
     let existe = true;
     while (existe) {
-        numero = Math.floor(100000 + Math.random() * 900000).toString(); // 6 dígitos
+        numero = Math.floor(100000 + Math.random() * 900000).toString(); // 6 dï¿½gitos
         const existente = await Usuario.findOne({ numeroIdentificacion: numero });
         if (!existente) {
             existe = false;
@@ -20,7 +20,7 @@ async function generarNumeroIdentificacionUnico() {
     return numero;
 }
 
-// Crear usuario (registro público)
+// Crear usuario (registro pï¿½blico)
 router.post('/', async (req, res) => {
     try {
         const { password, ...resto } = req.body;
@@ -86,6 +86,18 @@ router.put('/:id', auth, async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 });
+
+
+// GET /api/usuarios/me
+router.get('/me', auth, async (req, res) => {
+  try {
+    const usuario = await Usuario.findById(req.usuario.id).select('-password');
+    res.json(usuario);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener el perfil del usuario' });
+  }
+});
+
 
 // Eliminar usuario (solo admin)
 router.delete('/:id', auth, validarRol('admin'), async (req, res) => {
