@@ -4,16 +4,23 @@ const Tramite = require('../models/Tramite');
 const verificarToken = require('../middlewares/auth');
 const validarRol = require('../middlewares/ValidarRol');
 
-// 1. Crear trámite (usuario) con cita
+// 1. Crear trámite con cita (usuario)
 router.post('/', verificarToken, async (req, res) => {
     try {
+        const { tipoTramite_id, fechaHora } = req.body;
+
+        if (!fechaHora) {
+            return res.status(400).json({ mensaje: 'La fecha y hora de la cita es obligatoria' });
+        }
+
         const nuevoTramite = new Tramite({
             usuario_id: req.usuario.id,
-            tipoTramite_id: req.body.tipoTramite_id,
+            tipoTramite_id,
             codigoTramite: 'TRM-' + Date.now(),
             documentos: [],
-            fechaCita: req.body.fechaCita,
-            estadoCita: 'programada'
+            cita: {
+                fechaHora
+            }
         });
 
         const tramiteGuardado = await nuevoTramite.save();
@@ -48,7 +55,7 @@ router.put('/:id/documentos', verificarToken, async (req, res) => {
 // 3. Consultar todos los trámites del usuario logueado
 router.get('/mios', verificarToken, async (req, res) => {
     try {
-        const tramites = await Tramite.find({ usuario_id: req.usuario.id }).populate('tipoTramite_id');
+        const tramites = await Tramite.find({ usuario_id: req.usuario.id });
         res.json(tramites);
     } catch (error) {
         res.status(500).json({ mensaje: error.message });
@@ -58,7 +65,7 @@ router.get('/mios', verificarToken, async (req, res) => {
 // 4. Ver un trámite propio por ID
 router.get('/:id', verificarToken, async (req, res) => {
     try {
-        const tramite = await Tramite.findById(req.params.id).populate('tipoTramite_id');
+        const tramite = await Tramite.findById(req.params.id);
         if (!tramite) return res.status(404).json({ mensaje: 'Trámite no encontrado' });
 
         if (tramite.usuario_id.toString() !== req.usuario.id) {
@@ -74,7 +81,7 @@ router.get('/:id', verificarToken, async (req, res) => {
 // 5. Ver todos los trámites (admin)
 router.get('/', verificarToken, validarRol(['admin']), async (req, res) => {
     try {
-        const tramites = await Tramite.find().populate('usuario_id tipoTramite_id');
+        const tramites = await Tramite.find();
         res.json(tramites);
     } catch (error) {
         res.status(500).json({ mensaje: error.message });
@@ -102,8 +109,7 @@ router.put('/:id/aprobar', verificarToken, validarRol(['admin']), async (req, re
         const tramite = await Tramite.findById(req.params.id);
         if (!tramite) return res.status(404).json({ mensaje: 'Trámite no encontrado' });
 
-        tramite.estado = 'completado';
-        tramite.estadoCita = 'completada';
+        tramite.estado = 'completado'; // o 'aprobado' si defines ese estado
         await tramite.save();
 
         res.json({ mensaje: 'Trámite aprobado', tramite });
