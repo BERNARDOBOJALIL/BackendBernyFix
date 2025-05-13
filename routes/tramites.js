@@ -52,15 +52,18 @@ router.put('/:id/documentos', verificarToken, async (req, res) => {
     }
 });
 
-// 3. Consultar todos los trámites del usuario logueado
+// Backend: /api/tramites/mios
 router.get('/mios', verificarToken, async (req, res) => {
-    try {
-        const tramites = await Tramite.find({ usuario_id: req.usuario.id });
-        res.json(tramites);
-    } catch (error) {
-        res.status(500).json({ mensaje: error.message });
-    }
+  try {
+    const tramites = await Tramite.find({ usuario_id: req.usuario.id })
+      .populate('tipoTramite_id'); // Agregado aquí
+
+    res.json(tramites);
+  } catch (error) {
+    res.status(500).json({ mensaje: error.message });
+  }
 });
+
 
 // 4. Ver un trámite propio por ID
 router.get('/:id', verificarToken, async (req, res) => {
