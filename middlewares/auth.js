@@ -16,9 +16,11 @@ function verificarToken(req, res, next) {
         req.usuario = decoded; // Guardamos la info del usuario en el request
         next();
     } catch (error) {
+        console.log('Error verificando token:', error.message);
+        console.log(' Token recibido:', token);
         return res.status(403).json({ mensaje: 'Token inválido' });
     }
-}
+    }
 
 module.exports = verificarToken;
 
