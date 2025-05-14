@@ -118,16 +118,27 @@ router.put('/:id', verificarToken, validarRol(['admin']), async (req, res) => {
         const { tipoTramite_id, cita, documentos, estado } = req.body;
 
         if (tipoTramite_id) tramite.tipoTramite_id = tipoTramite_id;
-        if (cita?.fechaHora) tramite.cita.fechaHora = cita.fechaHora;
-        if (Array.isArray(documentos)) tramite.documentos = documentos;
         if (estado) tramite.estado = estado;
+        if (Array.isArray(documentos)) tramite.documentos = documentos;
+
+        // Manejo seguro de la cita
+        if (cita) {
+            if (!tramite.cita) {
+                tramite.cita = {}; // inicializar si no existe
+            }
+
+            if (cita.fechaHora) tramite.cita.fechaHora = cita.fechaHora;
+            if (cita.estado) tramite.cita.estado = cita.estado;
+        }
 
         const actualizado = await tramite.save();
         res.json({ mensaje: 'Trámite actualizado', tramite: actualizado });
     } catch (error) {
+        console.error(error);
         res.status(400).json({ mensaje: error.message });
     }
 });
+
 
 // 8. Eliminar un trámite (admin)
 router.delete('/:id', verificarToken, validarRol(['admin']), async (req, res) => {
