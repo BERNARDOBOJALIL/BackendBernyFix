@@ -106,19 +106,37 @@ router.put('/:id/estado', verificarToken, validarRol(['admin']), async (req, res
     }
 });
 
-// 7. Aprobar trámite directamente (admin)
-router.put('/:id/aprobar', verificarToken, validarRol(['admin']), async (req, res) => {
+// 7. Actualizar un trámite completo (admin)
+router.put('/:id', verificarToken, validarRol(['admin']), async (req, res) => {
     try {
         const tramite = await Tramite.findById(req.params.id);
         if (!tramite) return res.status(404).json({ mensaje: 'Trámite no encontrado' });
 
-        tramite.estado = 'completado'; // o 'aprobado' si defines ese estado
-        await tramite.save();
+        const { tipoTramite_id, cita, documentos, estado } = req.body;
 
-        res.json({ mensaje: 'Trámite aprobado', tramite });
+        if (tipoTramite_id) tramite.tipoTramite_id = tipoTramite_id;
+        if (cita?.fechaHora) tramite.cita.fechaHora = cita.fechaHora;
+        if (Array.isArray(documentos)) tramite.documentos = documentos;
+        if (estado) tramite.estado = estado;
+
+        const actualizado = await tramite.save();
+        res.json({ mensaje: 'Trámite actualizado', tramite: actualizado });
     } catch (error) {
         res.status(400).json({ mensaje: error.message });
     }
 });
 
+// 8. Eliminar un trámite (admin)
+router.delete('/:id', verificarToken, validarRol(['admin']), async (req, res) => {
+    try {
+        const tramite = await Tramite.findByIdAndDelete(req.params.id);
+        if (!tramite) return res.status(404).json({ mensaje: 'Trámite no encontrado' });
+
+        res.json({ mensaje: 'Trámite eliminado correctamente' });
+    } catch (error) {
+        res.status(500).json({ mensaje: error.message });
+    }
+});
+
 module.exports = router;
+
