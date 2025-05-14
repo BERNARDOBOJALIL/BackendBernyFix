@@ -84,7 +84,10 @@ router.get('/:id', verificarToken, async (req, res) => {
 // 5. Ver todos los trámites (admin)
 router.get('/', verificarToken, validarRol(['admin']), async (req, res) => {
     try {
-        const tramites = await Tramite.find();
+        const tramites = await Tramite.find()
+            .populate('usuario_id', 'nombre apellidos') // nombre y apellidos del usuario
+            .populate('tipoTramite_id', 'nombre');      // nombre del tipo de trámite
+
         res.json(tramites);
     } catch (error) {
         res.status(500).json({ mensaje: error.message });
